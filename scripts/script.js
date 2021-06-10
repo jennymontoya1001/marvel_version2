@@ -15,7 +15,7 @@ const templateCard = document.getElementById('template-card').content;
 const fragment = document.createDocumentFragment();
 const items = document.getElementById('items');
 const detail = document.getElementById('detail');
-
+let heroe = { };
 
 /*Recordemos que con nuestro evento DOMContentLoaded garantizamos
 que nos llame a la función loadImages luego de que cargue el DOM*/
@@ -58,6 +58,52 @@ const loadImage = data => {
    items.appendChild(fragment);
 }
 
+
+//FORMULARIO
+form.addEventListener('submit',function LocalStorage(){
+           
+    //captura de datos y almacenamiento en variables
+    let inputName = document.querySelector('#inputName').value;
+    let email = document.querySelector('#email').value;
+    let gender = document.querySelector('#gender').value
+    let message = document.querySelector('#msm').value;
+
+    //validación de campos vacíos
+    if(inputName=="" || email=="" || gender=="" || message==""){
+         alert('Ingresar todos los campos');
+         return true;
+    }
+    else{
+        if(isNaN(inputName)){
+            localStorage.setItem("Name", inputName);
+            localStorage.setItem("Email", email);
+            localStorage.setItem("Gender", gender);
+            localStorage.setItem("Message", message);
+            getLocalStorage();
+        }else{
+             alert("Name most string");
+        }
+        return false;
+    }
+
+    
+})
+
+//Obtener la información del local storage//
+function getLocalStorage(){
+    let nameSave = localStorage.getItem("Name");
+    let emailSave = localStorage.getItem("Email");
+    let genderSave = localStorage.getItem("Gender");
+    let messageSave = localStorage.getItem("Message");
+    alert(`The information stored is: ${nameSave} 
+    ${emailSave}
+    ${genderSave}
+    ${messageSave}`);
+}
+
+
+
+
 items.addEventListener('click', e => {
    // console.log(e.target.dataset.id);
    let idTarget = e.target.dataset.id;
@@ -90,6 +136,8 @@ items.addEventListener('click', e => {
            getSuperHero();
        }   
    })
+   e.stopPropagation();
+   e.preventDefault();
 })
 
 
@@ -97,22 +145,22 @@ function getSuperHero(){
     detail.innerHTML = '';
     /*JSON.parse tomamos el string(cadena de carateres) que está trayendo
     del local storage y lo convierte en formato json*/
-    const heroe = JSON.parse(localStorage.getItem("Heroe")); 
+    heroe = JSON.parse(localStorage.getItem("Heroe")); 
     /*desestructuración de objetos*/
     const {superhero,publisher,alter_ego,first_appearance,image} = heroe;
     /*pintamos a información desestructurada en una tabla*/
     detail.innerHTML = `
     <table border="2px" align="center">
-     <tr>
-        <td><img src="${image}" width="200" height="200"></td>
-        <td>
-        <h2>${superhero}</h2>
-        <h2>${publisher}</h2>
-        <h2>${alter_ego}</h2>
-        <h2>${first_appearance}</h2>
+    <tr>
+        <td rowspan="3"><img src="${image}"  width="400" height="500"></td>
+        <td align="center">
+         <h2>${superhero}</h2>
+         <h4>${publisher}</h4>
+         <h5>${alter_ego}</h5>
+         <h5>${first_appearance}</h5>
         </td>
-     </tr>
-    </table>
+    </tr>
+</table>
     `
 
 }
