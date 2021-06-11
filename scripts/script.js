@@ -15,7 +15,10 @@ const templateCard = document.getElementById('template-card').content;
 const fragment = document.createDocumentFragment();
 const items = document.getElementById('items');
 const detail = document.getElementById('detail');
+const listaCompra = document.getElementById('listaCompra');
+const listaTotal = document.getElementById('listaTotal');
 let heroe = { };
+let carrito = [];
 
 /*Recordemos que con nuestro evento DOMContentLoaded garantizamos
 que nos llame a la función loadImages luego de que cargue el DOM*/
@@ -111,7 +114,7 @@ items.addEventListener('click', e => {
    /*recorremos de nuevo la data*/
    data.forEach(heroe => {
        /*Desestructuramos*/
-       const {id,name,superhero,publisher,alter_ego,first_appearance,image} = heroe;
+       const {id,name,superhero,publisher,alter_ego,first_appearance,image,price} = heroe;
        /*validamos si el id capturado de la imagen al hacer clic es igual
        a algún id dentro de la data*/
        if(id == idTarget){
@@ -124,7 +127,8 @@ items.addEventListener('click', e => {
                publisher: publisher,
                alter_ego: alter_ego,
                first_appearance: first_appearance,
-               image: image
+               image: image,
+               price: price
            }
            
            /*Almacenamos en el local storage el heroe seleccionado*/
@@ -134,6 +138,9 @@ items.addEventListener('click', e => {
            con una estructura JSON(formato)*/
            localStorage.setItem("Heroe",JSON.stringify(objeto));
            getSuperHero();
+           carrito.push(objeto);
+           localStorage.setItem('Carrito',JSON.stringify(carrito));
+           listarCarrito();
        }   
    })
    e.stopPropagation();
@@ -147,7 +154,7 @@ function getSuperHero(){
     del local storage y lo convierte en formato json*/
     heroe = JSON.parse(localStorage.getItem("Heroe")); 
     /*desestructuración de objetos*/
-    const {superhero,publisher,alter_ego,first_appearance,image} = heroe;
+    const {superhero,publisher,alter_ego,first_appearance,image,price} = heroe;
     /*pintamos a información desestructurada en una tabla*/
     detail.innerHTML = `
     <table border="2px" align="center">
@@ -158,11 +165,63 @@ function getSuperHero(){
          <h4>${publisher}</h4>
          <h5>${alter_ego}</h5>
          <h5>${first_appearance}</h5>
+         <h5>${price}</h5>
         </td>
     </tr>
 </table>
     `
+}
 
+
+const listarCarrito = () => {
+    listaCompra.innerHTML = '';
+    let total = 0;
+    let totalInt = 0;
+    carrito = JSON.parse(localStorage.getItem('Carrito'));
+    carrito === null ? ( carrito = []) : (
+        carrito.forEach(element => {
+            totalInt += element.price;
+            listaCompra.innerHTML += 
+            `<br> <br>
+         <div width="100" height="100" align="center">
+         <span>${element.superhero}</span>
+         <span>${element.price}</span>
+         <span><button id="${element.id}">x</button></span><br>
+         </div>`
+         total = totalInt;
+        })
+    )
+    getTotal(total);
+}
+
+function getTotal(total){
+    listaTotal.innerHTML = '';
+    listaTotal.innerHTML = `<h1 align="center">Total a pagar ${total}</h1>`
+    localStorage.setItem('Total',total)
+}
+
+listaCompra.addEventListener('click', (e) =>{
+    e.preventDefault();
+
+   if(e.target.innerHTML == 'x'){
+        let id = e.target.id;
+        deleteHeroe(id);
+   }
+
+})
+
+
+function deleteHeroe(idI){
+    let indexArreglo;
+
+    carrito.forEach((elemento,index) =>{
+        if(elemento.id==idI)
+        indexArreglo = index;
+    })
+    
+    carrito.splice(indexArreglo,1);
+    localStorage.setItem('Carrito',JSON.stringify(carrito));
+    listarCarrito();
 }
 
 
